@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMI Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // Automatically update data every 2 seconds
+        function updateLiveData() {
+            fetch('/live_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature').textContent = `${data.temperature}°C`;
+                    document.getElementById('pressure').textContent = `${data.pressure} hPa`;
+                    document.getElementById('motor-state').textContent = data.motor_state ? "ON" : "OFF";
+
+                    // Update motor state with new graphics
+                    const motorImage = document.getElementById('motor-image');
+                    motorImage.src = data.motor_state ? "/static/images/fan_on.gif" : "/static/images/fan_off.png";
+                });
+        }
+
+        // Toggle motor state via AJAX
+        function toggleMotor() {
+            fetch('/toggle_motor', { method: 'POST' })
+                .then(() => updateLiveData());
+        }
+
+        setInterval(updateLiveData, 2000); // Refresh every 2 seconds
+    </script>
+</head>
+<body onload="updateLiveData()">
+    <header>
+        <h1>HMI Dashboard</h1>
+    </header>
+    <main>
+        <section class="system-info">
+            <h2>System Information</h2>
+
+            <div class="info-box">
+                <p><strong>Temperature:</strong> <span id="temperature">{{ temperature }}°C</span></p>
+                <p><strong>Pressure:</strong> <span id="pressure">{{ pressure }} hPa</span></p>
+                <p><strong>Motor State:</strong> <span id="motor-state">{{ motor_state }}</span></p>
+            </div>
+
+            <div class="toggle-button">
+                <button id="toggleMotorBtn" onclick="toggleMotor()">Toggle Motor</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 Modbus Lab. All rights reserved. Developed by RougeSec Academy</p>
+    </footer>
+</body>
+</html>
+

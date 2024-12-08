@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Simulation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Custom Styles for the Page */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #0066cc;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .simulation-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px;
+        }
+
+        .motor-status {
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .motor-status img {
+            width: 150px;
+            transition: transform 0.3s ease;
+        }
+
+        .motor-status img:hover {
+            transform: scale(1.1);
+        }
+
+        .data-display {
+            font-size: 1.2em;
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            text-align: left;
+        }
+
+        .data-display p {
+            margin: 10px 0;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .simulation-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .data-display {
+                width: 90%;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>System Simulation</h1>
+    </header>
+
+    <main>
+        <div class="simulation-container">
+            <!-- Motor Status with updated UI -->
+            <div class="motor-status">
+                <img id="motor-image" src="/static/images/fan_off.png" alt="Motor">
+            </div>
+
+            <div class="data-display">
+                <p id="temperature"><strong>Temperature:</strong> {{ temperature }}°C</p>
+                <p id="pressure"><strong>Pressure:</strong> {{ pressure }} Pa</p>
+            </div>
+            
+            
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Modbus Lab. All rights reserved. Developed by RougeSec Academy</p>
+    </footer>
+
+    <script>
+        setInterval(() => {
+            fetch('/live_data')
+                .then(response => response.json())
+                .then(data => {
+                    // Update motor image based on motor state
+                    document.getElementById('motor-image').src = data.motor_state ? "/static/images/fan_on.gif" : "/static/images/fan_off.png";
+
+                    // Update the temperature and pressure
+                    document.getElementById('temperature').textContent = `Temperature: ${data.temperature}°C`;
+                    document.getElementById('pressure').textContent = `Pressure: ${data.pressure} Pa`;
+                });
+        }, 2000);
+    </script>
+</body>
+</html>
+
